@@ -559,7 +559,7 @@ loadProgress();
     loadProgressFromServer();
 
     console.log("Progress updated:", { videos: videosWatched, quizzes: quizzesTaken, plan: planStatus });
-}
+
 
 /* --- SETTINGS FORM POPULATOR --- */
 function populateSettingsForm() {
