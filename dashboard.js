@@ -735,7 +735,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const exam = localStorage.getItem('userExam');
                 const weakTopics = ['Calculus', 'Thermodynamics'];
 
-                const response = await fetch('http://localhost:3000/api/generate-plan', {
+                const response = await fetch('https://web-production-7b014.up.railway.app/api/generate-plan', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ grade, exam, topics: weakTopics })
@@ -782,7 +782,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (submitBtn) submitBtn.disabled = true;
 
             try {
-                const response = await fetch('http://localhost:3000/api/generate-quiz', {
+                const response = await fetch('https://web-production-7b014.up.railway.app/api/generate-quiz', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ topic, exam })
