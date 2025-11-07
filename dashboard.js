@@ -1,16 +1,18 @@
-/* --- 1. NEW: WEIGHTAGE DATABASE --- */
+/* --- 1. GLOBAL VARIABLES AND CONSTANTS --- */
 
 const userEmail = localStorage.getItem("userEmail");
 const userName = localStorage.getItem("userName");
 
-
-// ✅ ADD THIS
+// Initialize videosWatched counter from localStorage
 let videosWatched = parseInt(localStorage.getItem('videosWatched') || '0', 10);
 
-
 // Show user's name in greeting
-document.getElementById("greeting-message").innerText = `Welcome, ${userName}!`;
+const greetingElement = document.getElementById("greeting-message");
+if (greetingElement) {
+    greetingElement.innerText = `Welcome, ${userName || 'Student'}!`;
+}
 
+// Exam Subject Weightage Database
 const weightageByExam = {
     "10th_boards": {
         title: "Class 10 Boards",
@@ -95,7 +97,7 @@ const weightageByExam = {
     }
 };
 
-/* --- 2. YOUR RESOURCE DATABASE (with Video URLs + PYQs) --- */
+/* --- RESOURCE DATABASE (Video URLs + PYQs) --- */
 const resourcesByExam = {
     // --- School ---
     "10th_boards": {
@@ -471,11 +473,12 @@ function loadGreeting() {
     if (greetingElement && userName) {
         greetingElement.textContent = `Welcome, ${userName}!`;
     } else if (greetingElement) {
+        // Fallback for if userName is null but element exists
         greetingElement.textContent = 'Welcome, Student!';
     }
 }
 
-/* --- (UPGRADED) PROGRESS FUNCTIONALITY --- */
+/* --- SERVER PROGRESS API FUNCTIONS --- */
 async function loadProgressFromServer() {
     // Optionally attempt to load progress from backend if userEmail exists
     const loggedInEmail = localStorage.getItem('userEmail');
@@ -489,11 +492,17 @@ async function loadProgressFromServer() {
         const quizStatsEl = document.getElementById("quizStats");
         const studyPlanEl = document.getElementById("studyPlanStatus");
 
+        // Update UI elements with server data
         if (progressValueEl && typeof data.progressPercent !== 'undefined') {
             progressValueEl.innerText = `${data.progressPercent}%`;
+            // Also update the visual progress indicator
+            const progressPieElement = document.querySelector('.progress-pie');
+            if (progressPieElement) {
+                progressPieElement.style.setProperty('--progress', data.progressPercent);
+            }
         }
         if (quizStatsEl && typeof data.quizzesTaken !== 'undefined') {
-            quizStatsEl.innerText = `${data.quizzesTaken} Quizzes`;
+            quizStatsEl.innerText = `${data.quizzesTaken} Quizzes Taken`;
         }
         if (studyPlanEl && typeof data.studyPlanWeek !== 'undefined') {
             studyPlanEl.innerText = data.studyPlanWeek;
@@ -519,33 +528,25 @@ async function updateProgressToServer(newProgressObj) {
     }
 }
 
-/* --- LOCAL PROGRESS UI REFRESH --- */
-async function loadProgress() {
-    const email = localStorage.getItem("userEmail");
-    if(!email){
-        console.log("No userEmail stored");
-        return;
+/* --- LOCAL PROGRESS UI REFRESH (Base for visual updates) --- */
+function loadProgress() {
+    // 1. Get Progress (Videos) from local storage
+    const videosWatched = parseInt(localStorage.getItem('videosWatched') || '0', 10);
+    const totalVideosGoal = 20;
+    const progressPercentage = Math.min(100, Math.round((videosWatched / totalVideosGoal) * 100));
+
+    const progressValueElement = document.getElementById('progressValue');
+    const progressPieElement = document.querySelector('.progress-pie');
+
+    // Apply basic video progress to the UI
+    if (progressPieElement) {
+        progressPieElement.style.setProperty('--progress', progressPercentage);
+    }
+    if (progressValueElement) {
+        progressValueElement.innerText = `${progressPercentage}%`;
     }
 
-    try {
-        const response = await fetch(`https://web-production-7b014.up.railway.app/api/progress/${email}`);
-        const data = await response.json();
-
-        document.getElementById("progressValue").innerText = data.progressPercent + "%";
-        document.querySelector(".progress-pie").style.setProperty("--progress", data.progressPercent);
-
-        document.getElementById("quizStats").innerText = data.quizzesTaken + " Quizzes Taken";
-        document.getElementById("studyPlanStatus").innerText = data.studyPlanWeek;
-    } catch (err) {
-        console.log("Progress load failed", err);
-    }
-}
-
-loadProgress();
-
-
-
-    // 2. Get Quizzes Taken
+    // 2. Get Quizzes Taken (Local Storage logic)
     const quizzesTaken = parseInt(localStorage.getItem('quizzesTaken') || '0', 10);
     const totalQuizzesGoal = 10;
     const quizBarPercentage = Math.min(100, Math.round((quizzesTaken / totalQuizzesGoal) * 100));
@@ -560,18 +561,18 @@ loadProgress();
         quizStatsLabel.innerText = `${quizzesTaken} / ${totalQuizzesGoal} Quizzes`;
     }
 
-    // 3. Get Study Plan Status
+    // 3. Get Study Plan Status (Local Storage logic)
     const planStatus = localStorage.getItem('studyPlanStatus') || 'Not Started';
     const studyPlanElement = document.getElementById('studyPlanStatus');
     if (studyPlanElement) {
         studyPlanElement.innerText = planStatus;
     }
 
-    // Try server-loaded progress as well (non-blocking)
+    // Try server-loaded progress as well (non-blocking) - This call will update the progress elements with server data if available.
     loadProgressFromServer();
 
-    console.log("Progress updated:", { videosWatched, quizzesTaken, planStatus });
-
+    console.log("Progress updated:", { videos: videosWatched, quizzes: quizzesTaken, plan: planStatus });
+}
 
 
 /* --- SETTINGS FORM POPULATOR --- */
@@ -585,7 +586,7 @@ function populateSettingsForm() {
     if (examEl) examEl.value = localStorage.getItem('userExam') || '10th_boards';
 }
 
-/* --- THEME-SETTING FUNCTION --- */
+/* --- THEME-SETTING FUNCTION (Immediately Invoked Function Expression) --- */
 (function applyTheme() {
     const savedTheme = localStorage.getItem('theme') || 'light';
     if (savedTheme === 'dark') {
@@ -688,6 +689,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (resetBtn) {
         resetBtn.addEventListener('click', () => {
+            // Note: localStorage.clear() removes ALL local data, including user profile.
             localStorage.removeItem('videosWatched');
             localStorage.removeItem('quizzesTaken');
             localStorage.removeItem('studyPlanStatus');
@@ -709,14 +711,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 4. INITIAL PAGE LOAD ---
+    // --- 4. INITIAL PAGE LOAD (Called again after DOM is fully loaded) ---
+    // loadProgress is intentionally called once outside DOMContentLoaded and once inside to cover all scenarios.
     loadDynamicResources();
     loadDynamicWeightage();
     loadGreeting();
-    loadProgress();
     populateSettingsForm();
 
-    // --- 5. AI STUDY PLAN LOGIC (Uses server.js) ---
+    // --- 5. AI STUDY PLAN LOGIC (Uses server.js on port 3000) ---
     const generateBtn = document.getElementById('generate-plan-btn');
     const planContent = document.getElementById('plan-content');
     const planLoading = document.getElementById('plan-loading');
@@ -744,11 +746,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 planContent.innerHTML = data.planHtml || '<p>No plan returned.</p>';
 
                 localStorage.setItem('studyPlanStatus', 'In Progress');
-                loadProgress();
+                loadProgress(); // Refresh progress UI
 
             } catch (error) {
                 console.error('Error generating plan:', error);
-                planContent.innerHTML = '<p style="color: red;">Sorry, an error occurred. Please try again.</p>';
+                planContent.innerHTML = '<p style="color: red;">Sorry, an error occurred. Please try again. Ensure the server is running on port 3000.</p>';
             } finally {
                 planLoading.style.display = 'none';
                 generateBtn.disabled = false;
@@ -756,7 +758,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 6. AI QUIZ GENERATION LOGIC (Uses server.js) ---
+    // --- 6. AI QUIZ GENERATION LOGIC (Uses server.js on port 3000) ---
     const quizForm = document.getElementById('quiz-setup-form');
     const quizContent = document.getElementById('quiz-content');
     const quizLoading = document.getElementById('quiz-loading');
@@ -793,7 +795,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             } catch (error) {
                 console.error('Error generating quiz:', error);
-                if (quizContent) quizContent.innerHTML = '<p style="color: red;">Sorry, an error occurred. Please try again.</p>';
+                if (quizContent) quizContent.innerHTML = '<p style="color: red;">Sorry, an error occurred. Please try again. Ensure the server is running on port 3000.</p>';
             } finally {
                 if (quizLoading) quizLoading.style.display = 'none';
                 if (submitBtn) submitBtn.disabled = false;
@@ -870,10 +872,10 @@ document.addEventListener('DOMContentLoaded', () => {
         quizzesTaken++;
         localStorage.setItem('quizzesTaken', String(quizzesTaken));
 
-        loadProgress();
+        loadProgress(); // Refresh progress UI
     }
 
-    // --- 7. (NEW) ADD CLICK LISTENER FOR VIDEO TRACKING ---
+    // --- 7. VIDEO WATCHING TRACKING ---
     const resourcesTab = document.getElementById('resources');
     if (resourcesTab) {
         resourcesTab.addEventListener('click', (e) => {
@@ -883,15 +885,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 let videosWatched = parseInt(localStorage.getItem('videosWatched') || '0', 10);
                 videosWatched++;
                 localStorage.setItem('videosWatched', String(videosWatched));
-                loadProgress();
+                loadProgress(); // Refresh progress UI
                 // link opens naturally
             }
         });
     }
 
-    // --- 8. (NEW) STANDALONE CHATBOT LOGIC ---
-    // Do NOT store real API keys in client-side code. Use server-side proxy instead.
-    const chatbotApiKey = "AIzaSyCBp2VyWJSIAf4L_9SrsrwuzmZ7MeD-WbI"; // replace via server or environment
+    // --- 8. STANDALONE CHATBOT LOGIC (API Key placeholder) ---
+    // WARNING: This key is publicly visible. Use a server-side proxy in production.
+    const chatbotApiKey = "AIzaSyCBp2VyWJSIAf4L_9SrsrwuzmZ7MeD-WbI"; 
     const chatbotApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${chatbotApiKey}`;
 
     const chatbotForm = document.getElementById('chatbot-form');
@@ -1002,5 +1004,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Auto-scroll
         chatbotMainContent.scrollTop = chatbotMainContent.scrollHeight;
     }
-
 });
+
+// Initial call to update the UI immediately on script load.
+loadProgress();
