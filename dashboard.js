@@ -4,6 +4,10 @@ const userEmail = localStorage.getItem("userEmail");
 const userName = localStorage.getItem("userName");
 
 
+// ✅ ADD THIS
+let videosWatched = parseInt(localStorage.getItem('videosWatched') || '0', 10);
+
+
 // Show user's name in greeting
 document.getElementById("greeting-message").innerText = `Welcome, ${userName}!`;
 
@@ -517,20 +521,28 @@ async function updateProgressToServer(newProgressObj) {
 
 /* --- LOCAL PROGRESS UI REFRESH --- */
 async function loadProgress() {
-    const userEmail = localStorage.getItem("userEmail");
+    const email = localStorage.getItem("userEmail");
+    if(!email){
+        console.log("No userEmail stored");
+        return;
+    }
 
-    const response = await fetch(`https://web-production-7b014.up.railway.app/api/progress/${userEmail}`);
-    const data = await response.json();
+    try {
+        const response = await fetch(`https://web-production-7b014.up.railway.app/api/progress/${email}`);
+        const data = await response.json();
 
-    document.getElementById("progressValue").innerText = data.progressPercent + "%";
-    document.getElementById("quizStats").innerText = data.quizzesTaken + " Quizzes Taken";
-    document.getElementById("studyPlanStatus").innerText = data.studyPlanWeek;
+        document.getElementById("progressValue").innerText = data.progressPercent + "%";
+        document.querySelector(".progress-pie").style.setProperty("--progress", data.progressPercent);
 
-    // Update circle progress style
-    document.querySelector(".progress-pie").style.setProperty("--progress", data.progressPercent);
+        document.getElementById("quizStats").innerText = data.quizzesTaken + " Quizzes Taken";
+        document.getElementById("studyPlanStatus").innerText = data.studyPlanWeek;
+    } catch (err) {
+        console.log("Progress load failed", err);
+    }
 }
 
 loadProgress();
+
 
 
     // 2. Get Quizzes Taken
@@ -558,7 +570,8 @@ loadProgress();
     // Try server-loaded progress as well (non-blocking)
     loadProgressFromServer();
 
-    console.log("Progress updated:", { videos: videosWatched, quizzes: quizzesTaken, plan: planStatus });
+    console.log("Progress updated:", { videosWatched, quizzesTaken, planStatus });
+
 
 
 /* --- SETTINGS FORM POPULATOR --- */
