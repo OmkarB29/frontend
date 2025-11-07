@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<!-- We add the Inter font here -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Dashboard - EduPath</title>
+    <!-- Main Dashboard Stylesheet -->
+    <link rel="stylesheet" href="dashboard.css">
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Load Tailwind CSS (for the chatbot) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Base page styling */
+        body {
+            font-family: 'Inter', sans-serif;
+            /* We let dashboard.css control the background */
+        }
+
+        /* --- (NEW) Chatbot Specific Styles --- */
+        #chat-toggle-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000; 
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 8px 16px rgba(0, 83, 156, 0.4), 0 0 6px rgba(0, 83, 156, 0.2);
+            /* These Tailwind classes are overridden by the CSS file, 
+               but we keep the base styles here */
+            background-color: #007bff;
+            color: white;
+            width: 60px;
+            height: 60px;
+            padding: 1rem;
+            border-radius: 9999px;
+            border: none;
+            cursor: pointer;
+        }
+        
+        #chat-widget-container {
+            position: fixed;
+            bottom: 90px; 
+            right: 20px;
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease, transform 0.4s ease, box-shadow 0.4s ease;
+            border-radius: 0.75rem; 
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        #chat-widget-container.open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        /* Mobile optimization: Full width on small screens */
+        @media (max-width: 640px) {
+            #chat-widget-container {
+                bottom: 0;
+                right: 0;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                max-width: none;
+                z-index: 1001; 
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. THE POP-UP MODAL (Hidden by default) -->
+    <div id="profile-setup-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="8.5" cy="7" r="4"></circle>
+                    <polyline points="17 11 19 13 23 9"></polyline>
+                </svg>
+            </div>
+            <form id="profile-setup-form">
+                <h2>Set Up Your Profile</h2>
+                <p>Just a few details to personalize your learning journey.</p>
+                
+                <!-- Name Input -->
+                <div class="input-group">
+                    <label for="user-name">Your Name:</label>
+                    <input type="text" id="user-name" name="user-name" placeholder="Enter your name" required>
+                </div>
+                
+                <!-- Grade Selection -->
+                <div class="input-group">
+                    <label for="grade">Select Your Current Grade:</label>
+                    <select id="grade" name="grade" required>
+                        <option value="" disabled selected>-- Select Grade --</option>
+                        <option value="10">10th Grade</option>
+                        <option value="11">11th Grade</option>
+                        <option value="12">12th Grade</option>
+                        <option value="not_applicable">Not Applicable</option>
+                    </select>
+                </div>
+                
+                <!-- Target Exam Selection -->
+                <div class="input-group">
+                    <label for="target-exam">Select Your Target Exam:</label>
+                    <select id="target-exam" name="target-exam" required>
+                        <option value="" disabled selected>-- Select Exam --</option>
+                        <optgroup label="School">
+                            <option value="10th_boards">10th Boards</option>
+                            <option value="12th_boards">12th Boards</option>
+                        </optgroup>
+                        <optgroup label="Undergraduate">
+                            <option value="jee">IIT-JEE (Engineering)</option>
+                            <option value="neet">NEET (Medical)</option>
+                            <option value="clat">CLAT (Law)</option>
+                        </optgroup>
+                        <optgroup label="Graduate">
+                            <option value="cat">CAT (MBA)</option>
+                            <option value="gate">GATE (M.Tech)</option>
+                            <option value="gre">GRE (International)</option>
+                        </optgroup>
+                        <optgroup label="Post Graduate / Professional">
+                            <option value="upsc">UPSC (Civil Services)</option>
+                            <option value="net">UGC-NET (Professor)</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <button type="submit" class="login-button">Save & Continue</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. THE STICKY HEADER -->
+    <header class="dashboard-header">
+        <a href="#" class="header-logo">EduPath</a>
+        <a href="#" class="logout-button">Logout</a>
+    </header>
+
+    <!-- 3. DASHBOARD MAIN CONTENT (Tabs + Content Area) -->
+    <main class="dashboard-main-content">
+
+        <!-- 3a. Vertical Tab Navigation -->
+        <nav class="dashboard-nav">
+            <ul>
+                <!-- (FIXED) All tabs are now visible -->
+                <li><a href="#" class="active" data-tab="home">Student Homepage</a></li>
+                <li><a href="#" data-tab="weightage">Exam Weightage</a></li>
+                <li><a href="#" data-tab="resources">Learning Resources</a></li>
+                <li><a href="#" data-tab="ai-plan">AI Study Plan</a></li>
+                <li><a href="#" data-tab="quiz">Quiz</a></li>
+                <li><a href="#" data-tab="settings">Settings</a></li>
+            </ul>
+        </nav>
+
+        <!-- 3b. Tab Content Area -->
+        <section class="dashboard-tab-content">
+
+            <!-- "Home" Tab Pane -->
+            <div id="home" class="tab-pane active">
+                <h1 id="greeting-message">Welcome, Student!</h1>
+                <p>This is your homepage. Your quick stats and reminders will appear here.</p>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Progress</h3>
+                        <div class="progress-pie" style="--progress: 42">
+                            <span id="progressValue" class="progress-pie-value">42%</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Quizzes Taken</h3>
+                        <div class="progress-bar-container">
+                            <div id="quizBar" class="progress-bar-fill" style="--progress: 80"></div>
+                        </div>
+                        <span id="quizStats" class="progress-bar-label">8 / 10 Quizzes</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Study Plan</h3>
+                        <span id="studyPlanStatus">Week 2</span>
+                    </div>
+                </div>
+                <div id="exam-list" class="mt-8">
+                    <!-- This is a placeholder for future features -->
+                </div>
+            </div>
+
+            <!-- "Exam Weightage" Tab Pane (Dynamic) -->
+            <div id="weightage" class="tab-pane">
+                <!-- JavaScript will build the chart here -->
+            </div>
+
+            <!-- "Learning Resources" Tab Pane (Dynamic) -->
+            <div id="resources" class="tab-pane">
+                <!-- JavaScript will build videos and PYQs here -->
+            </div>
+
+            <!-- (FIXED) "AI Study Plan" Tab Pane -->
+            <div id="ai-plan" class="tab-pane">
+                <div class="ai-container">
+                    <h1>AI Personalized Study Plan</h1>
+                    <p>Your week-by-week plan generated by our AI, based on your profile.</p>
+                    <button id="generate-plan-btn" class="login-button">Generate My 1-Week Plan</button>
+                    <div id="plan-loading" style="display: none; margin-top: 1rem;">
+                        Generating your plan, please wait...
+                    </div>
+                    <div id="plan-content">
+                        <!-- The AI's plan will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- (FIXED) "Quiz" Tab Pane -->
+            <div id="quiz" class="tab-pane">
+                <div class="quiz-container">
+                    <h1>Practice Quiz</h1>
+                    <p>Test your knowledge on a specific topic.</p>
+                    <form id="quiz-setup-form" class="quiz-form">
+                        <div class="input-group">
+                            <label for="quiz-topic">Enter a Topic:</label>
+                            <input type="text" id="quiz-topic" name="quiz-topic" placeholder="e.g., Physics - Thermodynamics" required>
+                        </div>
+                        <button type="submit" class="login-button">Generate Quiz</button>
+                    </form>
+                    <div id="quiz-loading" style="display: none; margin-top: 1rem;">
+                        Generating your quiz...
+                    </div>
+                    <div id="quiz-content" class="quiz-content"></div>
+                    <div id="quiz-results" class="quiz-results"></div>
+                </div>
+            </div>
+
+            <!-- "Settings" Tab Pane -->
+            <div id="settings" class="tab-pane">
+                <h1>Settings</h1>
+                <p>Manage your account and preferences.</p>
+
+                <!-- Update Profile Section -->
+                <section class="settings-section">
+                    <h2>Your Profile</h2>
+                    <form id="update-profile-form">
+                        <div class="input-group">
+                            <label for="settings-name">Your Name:</label>
+                            <input type="text" id="settings-name" name="settings-name" placeholder="Enter your name" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="settings-grade">Your Grade:</label>
+                            <select id="settings-grade" name="settings-grade" required>
+                                <option value="10">10th Grade</option>
+                                <option value="11">11th Grade</option>
+                                <option value="12">12th Grade</option>
+                                <option value="not_applicable">Not Applicable</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="settings-exam">Your Target Exam:</label>
+                            <select id="settings-exam" name="settings-exam" required>
+                                <optgroup label="School">
+                                    <option value="10th_boards">10th Boards</option>
+                                    <option value="12th_boards">12th Boards</option>
+                                </optgroup>
+                                <optgroup label="Undergraduate">
+                                    <option value="jee">IIT-JEE (Engineering)</option>
+                                    <option value="neet">NEET (Medical)</option>
+                                    <option value="clat">CLAT (Law)</option>
+                                </optgroup>
+                                <optgroup label="Graduate">
+                                    <option value="cat">CAT (MBA)</option>
+                                    <option value="gate">GATE (M.Tech)</option>
+                                    <option value="gre">GRE (International)</option>
+                                </optgroup>
+                                <optgroup label="Post Graduate / Professional">
+                                    <option value="upsc">UPSC (Civil Services)</option>
+                                    <option value="net">UGC-NET (Professor)</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <button type="submit" class="login-button" style="width: auto;">Save Changes</button>
+                        <span id="save-success-message" class="success-message">Profile saved!</span>
+                    </form>
+                </section>
+
+                <!-- Theme Section -->
+                <section class="settings-section">
+                    <h2>Appearance</h2>
+                    <div class="toggle-switch-container">
+                        <span class="toggle-label">Dark Mode</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="theme-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </section>
+
+                <!-- Danger Zone -->
+                <section class="settings-section danger-zone">
+                    <h2>Danger Zone</h2>
+                    <p>This action cannot be undone. This will permanently delete your profile and all saved data.</p>
+                    <button id="reset-profile-btn" class="danger-button">Reset All Data</button>
+                </section>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- ==== FLOATING CHATBOT HTML ==== -->
+
+    <!-- 1. CHAT WIDGET CONTAINER -->
+    <div id="chat-widget-container" class="shadow-2xl hidden fixed right-5 bottom-[90px] z-[999] w-full max-w-md rounded-xl overflow-hidden" style="opacity: 0; transform: translateY(10px); transition: opacity 0.4s ease, transform 0.4s ease;">
+        <div class="chat-widget flex flex-col h-[70vh] min-h-[450px]">
+            <header class="p-4 text-center chat-title shadow-md flex justify-between items-center bg-[#1a3a5e]">
+                <h1 class="text-xl font-bold text-white">Study Assistant</h1>
+                <button onclick="toggleChat()" class="text-white opacity-80 hover:opacity-100 transition duration-150">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </header>
+
+            <div id="chat-main-content" class="flex-grow p-4 space-y-4 overflow-y-auto" style="scroll-behavior: smooth;">
+                <div id="welcome-screen" class="p-4 text-center flex flex-col items-center justify-center h-full">
+                    <div class="welcome-icon mb-4 text-[#4c7a9f]">
+                        <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 21h.01M17.001 17h-1.001A3 3 0 0113 14h-2a3 3 0 01-3-3V7a3 3 0 013-3h2a3 3 0 013 3v4a3 3 0 01-3 3h-2a3 3 0 00-3 3h4.673zM12 3a1 1 0 011 1v1a1 1 0 01-2 0V4a1 1 0 011-1zM20 12h.01M4 12h.01M18.83 5.17l-1.414 1.414M6.586 17.414l-1.414 1.414M17.414 6.586l1.414-1.414M5.17 18.83l1.414-1.414"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-6">How can I assist you today?</h3>
+                    <div class="space-y-3 w-full">
+                        <div class="suggestion-chip" onclick="sendChatSuggestion('Help me build a study schedule')">Build a study schedule</div>
+                        <div class="suggestion-chip" onclick="sendChatSuggestion('What are effective study techniques?')">Effective study techniques</div>
+                        <div class="suggestion-chip" onclick="sendChatSuggestion('Summarize my class notes on...')">Summarize my notes</div>
+                    </div>
+                </div>
+                <div id="message-list" class="flex flex-col space-y-3">
+                    <!-- Messages will be added dynamically -->
+                </div>
+            </div>
+
+            <div class="chat-input-container p-4 border-t">
+                <form id="chatbot-form" class="flex gap-2 mb-2">
+                    <input type="text" id="chatbot-input" placeholder="Ask a question..." class="chat-input flex-grow p-3 rounded-lg border" required autocomplete="off">
+                    <button type="submit" id="chatbot-send-button" class="send-button flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </button>
+                </form>
+                <div class="text-xs text-gray-400 text-center">Powered by Study Strategist AI</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 2. FLOATING TOGGLE BUTTON -->
+    <button id="chat-toggle-button" onclick="toggleChat()">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 21h.01M17.001 17h-1.001A3 3 0 0113 14h-2a3 3 0 01-3-3V7a3 3 0 013-3h2a3 3 0 013 3v4a3 3 0 01-3 3h-2a3 3 0 00-3 3h4.673zM12 3a1 1 0 011 1v1a1 1 0 01-2 0V4a1 1 0 011-1zM20 12h.01M4 12h.01M18.83 5.17l-1.414 1.414M6.586 17.414l-1.414 1.414M17.414 6.586l1.414-1.414M5.17 18.83l1.414-1.414"></path></svg>
+    </button>
+    <!-- ==== END OF CHATBOT HTML ==== -->
+
+
+    <!-- Link the main dashboard script -->
+    <script src="dashboard.js"></script>
+    
+    <!-- Global Chatbot Toggle Functions -->
+    <script>
+        function toggleChat() {
+            const widgetContainer = document.getElementById('chat-widget-container');
+            const toggleButton = document.getElementById('chat-toggle-button');
+            const userInput = document.getElementById('chatbot-input');
+            const isOpen = !widgetContainer.classList.contains('hidden');
+            
+            if (isOpen) {
+                // Closing
+                widgetContainer.style.opacity = 0;
+                widgetContainer.style.transform = 'translateY(10px)';
+                setTimeout(() => {
+                    widgetContainer.classList.add('hidden');
+                }, 400); // Match transition duration
+                toggleButton.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 21h.01M17.001 17h-1.001A3 3 0 0113 14h-2a3 3 0 01-3-3V7a3 3 0 013-3h2a3 3 0 013 3v4a3 3 0 01-3 3h-2a3 3 0 00-3 3h4.673zM12 3a1 1 0 011 1v1a1 1 0 01-2 0V4a1 1 0 011-1zM20 12h.01M4 12h.01M18.83 5.17l-1.414 1.414M6.586 17.414l-1.414 1.414M17.414 6.586l1.414-1.414M5.17 18.83l1.414-1.414"></path></svg>';
+            } else {
+                // Opening
+                widgetContainer.classList.remove('hidden');
+                setTimeout(() => {
+                    widgetContainer.style.opacity = 1;
+                    widgetContainer.style.transform = 'translateY(0)';
+                }, 10); 
+                if (userInput) {
+                    userInput.focus();
+                }
+                toggleButton.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+            }
+        }
+
+        // Helper function to send suggestions
+        function sendChatSuggestion(text) {
+            const userInput = document.getElementById('chatbot-input');
+            const sendButton = document.getElementById('chatbot-send-button'); 
+            if (userInput && sendButton) {
+                userInput.value = text;
+                sendButton.click(); 
+            }
+        }
+    </script>
+</body>
+</html>

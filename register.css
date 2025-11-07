@@ -1,0 +1,95 @@
+/* Background and layout */
+.register-body {
+  background-image: url('register.jpg');
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding: 1.5rem;
+  position: relative;
+}
+
+
+/* Register card */
+.register-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  border-radius: 1.25rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  margin-top: 2.5rem;
+  margin-right: 2.5rem;
+}
+
+/* Heading */
+.register-heading {
+  text-align: center;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+}
+
+/* Labels and inputs */
+.form-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 0.25rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  outline: none;
+  transition: 0.2s;
+}
+
+.form-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+/* Register button */
+.register-btn {
+  width: 100%;
+  background: linear-gradient(to right, #2563eb, #7c3aed);
+  color: white;
+  font-weight: 600;
+  padding: 0.6rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 0.5rem;
+}
+
+.register-btn:hover {
+  background: linear-gradient(to right, #1d4ed8, #6d28d9);
+  box-shadow: 0 5px 15px rgba(124, 58, 237, 0.3);
+}
+
+/* Login text */
+.login-link {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #334155;
+  margin-top: 1rem;
+}
+
+.login-link a {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}

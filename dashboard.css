@@ -1,0 +1,915 @@
+/* --- Global Styles & Variables --- */
+/* * We define all colors as variables.
+ * This makes Dark Mode possible.
+ */
+html {
+    --primary-color: #007bff;
+    --primary-hover: #0056b3;
+    --light-bg: #f8f9fa;
+    /* Page background */
+    --card-bg: #ffffff;
+    /* Card/header background */
+    --border-color: #dee2e6;
+    --text-color: #333;
+    --text-light: #666;
+
+    /* Add a smooth transition for all colors */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* * We define the new Dark Mode colors.
+ * When the <html> tag gets the .dark-mode class,
+ * these colors will override the default ones.
+ */
+html.dark-mode {
+    --primary-color: #0d6efd;
+    --primary-hover: #3b8bff;
+    --light-bg: #121212;
+    /* Dark page background */
+    --card-bg: #1e1e1e;
+    /* Dark card/header background */
+    --border-color: #444;
+    --text-color: #f8f9fa;
+    --text-light: #aaa;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    background-color: var(--light-bg);
+    color: var(--text-color);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin-top: 0;
+}
+
+/* --- 1. POP-UP MODAL STYLES --- */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+}
+
+.modal-icon {
+    background-color: #e6f2ff;
+    color: var(--primary-color);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-icon svg {
+    width: 32px;
+    height: 32px;
+}
+
+.modal-content h2 {
+    margin-bottom: 0.5rem;
+}
+
+.modal-content p {
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+/* --- (NEW) Upgraded Input Group Styles --- */
+.input-group {
+    margin-bottom: 1.5rem;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+/* Style for all text inputs */
+.input-group input[type="text"] {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    font-size: 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--card-bg);
+    box-sizing: border-box;
+    /* Ensures padding works correctly */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    color: var(--text-color);
+}
+
+/* Style for all select dropdowns */
+.input-group select {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    font-size: 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Style for when you click *into* the inputs */
+.input-group input[type="text"]:focus,
+.input-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+}
+
+
+/* --- Common Button Style --- */
+.login-button {
+    display: inline-block;
+    width: 100%;
+    padding: 0.85rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.2s ease;
+}
+
+.login-button:hover {
+    background-color: var(--primary-hover);
+}
+
+
+/* --- 2. STICKY HEADER --- */
+.dashboard-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    /* --header-height */
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+    box-sizing: border-box;
+    z-index: 900;
+}
+
+.header-logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.logout-button {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    background-color: #e6f2ff;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.logout-button:hover {
+    background-color: #d1e7ff;
+}
+
+
+/* --- 3. DASHBOARD MAIN CONTENT --- */
+.dashboard-main-content {
+    display: flex;
+    padding-top: 60px;
+    /* --header-height */
+}
+
+/* --- 3a. Vertical Tab Navigation --- */
+.dashboard-nav {
+    width: 240px;
+    flex-shrink: 0;
+    background-color: var(--card-bg);
+    border-right: 1px solid var(--border-color);
+    height: calc(100vh - 60px);
+    /* --header-height */
+    position: fixed;
+    top: 60px;
+    /* --header-height */
+    left: 0;
+    padding: 1.5rem 0;
+}
+
+.dashboard-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.dashboard-nav li a {
+    display: block;
+    padding: 0.85rem 2rem;
+    text-decoration: none;
+    color: var(--text-light);
+    font-weight: 500;
+    border-left: 3px solid transparent;
+}
+
+.dashboard-nav li a:hover {
+    background-color: var(--light-bg);
+    color: var(--text-color);
+}
+
+.dashboard-nav li a.active {
+    color: var(--primary-color);
+    font-weight: 700;
+    border-left-color: var(--primary-color);
+    background-color: #e6f2ff;
+}
+
+
+/* --- 3b. Tab Content Area --- */
+.dashboard-tab-content {
+    flex-grow: 1;
+    margin-left: 240px;
+    padding: 2rem;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+
+/* --- 4. HOMEPAGE STAT CARDS --- */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.stat-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-card h3 {
+    font-size: 1rem;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+/* This targets the "Week 2" text */
+.stat-card>span {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-align: center;
+    margin: auto 0;
+    padding: 1rem 0;
+}
+
+/* --- 5. CHART & VISUAL STYLES --- */
+
+/* --- Progress Pie Chart (Homepage) --- */
+.progress-pie {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin: 1rem auto 0;
+    position: relative;
+    --progress-angle: calc(var(--progress, 0) * 3.6deg);
+
+    background: conic-gradient(var(--primary-color) var(--progress-angle),
+            var(--border-color) var(--progress-angle) 360deg);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.progress-pie::before {
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    background: var(--card-bg);
+    /* Use variable for dark mode */
+    border-radius: 50%;
+}
+
+.progress-pie-value {
+    position: relative;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* --- Progress Bar (Homepage) --- */
+.progress-bar-container {
+    width: 100%;
+    height: 16px;
+    background-color: var(--border-color);
+    /* Use variable for dark mode */
+    border-radius: 20px;
+    margin: 2.2rem 0 0.75rem;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    width: calc(var(--progress, 0) * 1%);
+    background-color: var(--primary-color);
+    border-radius: 20px;
+    transition: width 0.4s ease-out;
+}
+
+.progress-bar-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-light);
+    display: block;
+    text-align: center;
+}
+
+/* --- 6. DOUGHNUT CHART STYLES (Weightage) --- */
+
+.weightage-chart-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5rem;
+    margin-top: 2rem;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+}
+
+.doughnut-chart {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* The 'background' property is now set by JavaScript */
+}
+
+.doughnut-chart::before {
+    content: "";
+    position: absolute;
+    width: 60%;
+    height: 60%;
+    background: var(--card-bg);
+    /* Use variable for dark mode */
+    border-radius: 50%;
+}
+
+.doughnut-center-text {
+    position: relative;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+.doughnut-center-text br {
+    line-height: 0.5rem;
+}
+
+.chart-legend {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    min-width: 200px;
+}
+
+.chart-legend li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+}
+
+.chart-legend li::before {
+    content: "";
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    margin-right: 0.75rem;
+    background-color: var(--subject-color);
+    /* Set by JS */
+}
+
+.chart-legend li span {
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.chart-legend li strong {
+    margin-left: auto;
+    color: var(--text-color);
+    font-weight: 700;
+}
+
+/* --- 7. UPGRADED QUIZ UI STYLES --- */
+
+.quiz-container {
+    max-width: 768px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.quiz-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    background-color: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.quiz-form .input-group {
+    flex-grow: 1;
+    margin-bottom: 0;
+}
+
+.quiz-form .login-button {
+    width: auto;
+    flex-shrink: 0;
+}
+
+.quiz-content {
+    margin-top: 1.5rem;
+}
+
+.question-block {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+}
+
+.question-block h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+}
+
+.options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.option-label {
+    display: block;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.option-label:hover {
+    background-color: var(--light-bg);
+    border-color: #b0c4de;
+}
+
+.option-label input[type="radio"] {
+    display: none;
+}
+
+.option-label span {
+    display: flex;
+    align-items: center;
+}
+
+.option-label span::before {
+    content: "";
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+    margin-right: 1rem;
+    transition: all 0.2s ease;
+    background-color: #fff;
+}
+
+.option-label input[type="radio"]:checked+span::before {
+    border-color: var(--primary-color);
+    background-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--card-bg) inset;
+}
+
+.option-label:has(input[type="radio"]:checked) {
+    border-color: var(--primary-color);
+    background-color: #e6f2ff;
+    color: var(--primary-color);
+}
+
+#submit-quiz-btn {
+    width: 100%;
+    font-size: 1.1rem;
+    padding: 1rem;
+    margin-top: 1.5rem;
+}
+
+.quiz-results {
+    background: linear-gradient(135deg, #e6f2ff 0%, #d1e7ff 100%);
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    margin-top: 2rem;
+    animation: fadeIn 0.5s ease;
+}
+
+.quiz-results h3 {
+    color: var(--primary-color);
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.quiz-results p {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- 9. VIDEO CARD UI STYLES (Resources) --- */
+
+.subject-header {
+    font-size: 1.75rem;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0.5rem;
+    margin-top: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.video-card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.video-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.2s ease-in-out;
+}
+
+.video-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.video-title {
+    font-size: 1.15rem;
+    margin-bottom: 0.25rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    min-height: 2.5em;
+}
+
+.video-channel {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 1rem;
+}
+
+.video-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.meta-duration {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.meta-difficulty {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    color: #fff;
+}
+
+.difficulty-easy {
+    background-color: #28a745;
+}
+
+.difficulty-medium {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.difficulty-hard {
+    background-color: #dc3545;
+}
+
+.video-link {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 600;
+    color: var(--primary-color);
+    background-color: #e6f2ff;
+    padding: 0.6rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.video-link:hover {
+    background-color: #d1e7ff;
+}
+
+/* --- 10. PYQ (Previous Year Questions) STYLES --- */
+
+.pyq-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+}
+
+.pyq-year-block {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.pyq-year-block h3 {
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+    color: var(--primary-color);
+}
+
+.pyq-paper-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.pyq-paper-list li a {
+    display: block;
+    text-decoration: none;
+    font-weight: 600;
+    color: var(--text-color);
+    background-color: var(--light-bg);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.pyq-paper-list li a:hover {
+    background-color: #e6f2ff;
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    transform: translateX(3px);
+}
+
+/* --- 11. STYLES FOR SETTINGS PAGE --- */
+
+.settings-section {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    max-width: 700px;
+}
+
+.settings-section h2 {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+}
+
+/* --- Dark Mode Toggle --- */
+.toggle-switch-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.toggle-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked+.slider {
+    background-color: var(--primary-color);
+}
+
+input:checked+.slider:before {
+    transform: translateX(22px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* --- Danger Zone --- */
+.danger-zone {
+    border-color: #dc3545;
+}
+
+.danger-zone h2 {
+    color: #dc3545;
+}
+
+.danger-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.danger-button:hover {
+    background-color: #c82333;
+}
+
+/* --- Success Message (Hidden) --- */
+.success-message {
+    display: none;
+    color: #28a745;
+    font-weight: 600;
+    margin-top: 1rem;
+}
+
+/* --- DARK MODE THEME COLORS --- */
+/* (These are now applied at the top in the <html> tag) */
+/* Chat Message Bubble Styles */
+.user-message {
+    background-color: var(--primary-color);
+    color: #fff;
+    border-radius: 12px;
+}
+
+.bot-message {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+}
+
+/* Ensure Chat Area has solid background */
+#chat-main-content {
+    background-color: var(--light-bg);
+}
+
+/* Dark mode support */
+html.dark-mode #chat-main-content {
+    background-color: #0f0f0f;
+}
+
+html.dark-mode .bot-message {
+    background-color: #1e1e1e;
+    border-color: #444;
+    color: #fff;
+}
+
+html.dark-mode .user-message {
+    background-color: #3b8bff;
+}
