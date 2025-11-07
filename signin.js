@@ -6,20 +6,31 @@ document.getElementById("login-form").addEventListener("submit", async function(
         password: document.getElementById("password").value
     };
 
-    const response = await fetch("https://web-production-7b014.up.railway.app/api/auth/login", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(loginData)
-    });
+    try {
+        const response = await fetch("https://web-production-7b014.up.railway.app/api/auth/login", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(loginData)
+        });
 
-    const result = await response.json(); // <-- CHANGE: Expecting user object
+        // ✅ If login failed (401), show message
+        if (!response.ok) {
+            document.getElementById("error-message").innerText = "Invalid email or password!";
+            return;
+        }
 
-    if(result && result.id){ // Login success
+        const result = await response.json();  // Expected: { id, name, email }
+
+        // ✅ Store needed user data for dashboard
         localStorage.setItem("userId", result.id);
-        localStorage.setItem("userName", result.name); // ✅ SAVE NAME
+        localStorage.setItem("userName", result.name);
+        localStorage.setItem("userEmail", result.email); // ✅ IMPORTANT FOR PROGRESS
+
+        // ✅ Redirect to dashboard
         window.location.href = "dashboard.html";
-    } 
-    else {
-        document.getElementById("error-message").innerText = "Invalid email or password!";
+
+    } catch (error) {
+        console.error("Login error:", error);
+        document.getElementById("error-message").innerText = "Server error! Try again.";
     }
 });

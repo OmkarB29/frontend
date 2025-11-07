@@ -1,4 +1,12 @@
 /* --- 1. NEW: WEIGHTAGE DATABASE --- */
+
+const userEmail = localStorage.getItem("userEmail");
+const userName = localStorage.getItem("userName");
+
+
+// Show user's name in greeting
+document.getElementById("greeting-message").innerText = `Welcome, ${userName}!`;
+
 const weightageByExam = {
     "10th_boards": {
         title: "Class 10 Boards",
@@ -508,22 +516,22 @@ async function updateProgressToServer(newProgressObj) {
 }
 
 /* --- LOCAL PROGRESS UI REFRESH --- */
-function loadProgress() {
-    // 1. Get Progress (Videos)
-    const videosWatched = parseInt(localStorage.getItem('videosWatched') || '0', 10);
-    const totalVideosGoal = 20;
-    const progressPercentage = Math.min(100, Math.round((videosWatched / totalVideosGoal) * 100));
+async function loadProgress() {
+    const userEmail = localStorage.getItem("userEmail");
 
-    const progressValueElement = document.getElementById('progressValue');
-    const progressPieElement = document.querySelector('.progress-pie');
+    const response = await fetch(`https://web-production-7b014.up.railway.app/api/progress/${userEmail}`);
+    const data = await response.json();
 
-    if (progressPieElement) {
-        // if you're using CSS custom properties, set numeric percent
-        progressPieElement.style.setProperty('--progress', progressPercentage);
-    }
-    if (progressValueElement) {
-        progressValueElement.innerText = `${progressPercentage}%`;
-    }
+    document.getElementById("progressValue").innerText = data.progressPercent + "%";
+    document.getElementById("quizStats").innerText = data.quizzesTaken + " Quizzes Taken";
+    document.getElementById("studyPlanStatus").innerText = data.studyPlanWeek;
+
+    // Update circle progress style
+    document.querySelector(".progress-pie").style.setProperty("--progress", data.progressPercent);
+}
+
+loadProgress();
+
 
     // 2. Get Quizzes Taken
     const quizzesTaken = parseInt(localStorage.getItem('quizzesTaken') || '0', 10);
